@@ -73,13 +73,24 @@ class rThread(threading.Thread):
             cur.execute('''INSERT INTO images (height, path) VALUES(?, 'C:\') ''', height)
         #endregion
 
-        #region Resim Çekme
+        #region Mod öğrenme
+        elif msg[0] == "MOD":
+            cur.execute('''SELECT mode FROM locations WHERE camera = "true"''')
+            locations = cur.fetchall()
+            camera_location = locations[0]
+            mode = camera_location[0]
+            self.qThread.put("MOD:"+mode)
+        #endregion
+
+        #region Manuel mod
         elif msg[0] == "MAN":
+            cur.execute('''UPDATE locations SET mode = "MAN" WHERE camera = "true"''')
             self.qThread.put("MAN")
         #endregion
         
-        #region Resim Çekme
+        #region Otomatik mod
         elif msg[0] == "OTO":
+            cur.execute('''UPDATE locations SET mode = "OTO" WHERE camera = "true"''')
             self.qThread.put("OTO")
         #endregion
         
