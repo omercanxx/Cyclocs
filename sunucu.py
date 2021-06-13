@@ -33,10 +33,7 @@ class rThread(threading.Thread):
 
         #region Veri girişi
         if msg[0] == "CRT":
-            print("1")
-            #Eğer kullanıcı tabloda var ise kullanıcının şifre kontrolü yapılıyor
             if msg[1] == "LOC":
-                print("2")
                 cur.execute('''INSERT INTO locations (height, camera) VALUES(?,?) ''', (msg[2], msg[3],))
         #endregion
 
@@ -101,30 +98,30 @@ class rThread(threading.Thread):
             cur.execute('''SELECT height, camera FROM locations ORDER BY camera DESC''')
             locations = cur.fetchall()
             camera_location = locations[0]
-            #height = camera_location[0]
-            print(camera_location)
+            height = camera_location[0]
+            self.qThread.put("CAM:"+ str(height))
         #endregion
         
         #region Kameranın yukarıya hareketi
         elif msg[0] == "MVU":
             #Diğer istemcilere iletmenin yolu
-            self.qThread.put("MVU")
             cur.execute('''SELECT height FROM locations WHERE camera = "true" ''')
             locations = cur.fetchall()
             camera_location = locations[0]
             height = camera_location[0]
             height = height + 1
+            self.qThread.put("CAM:"+str(height))
             cur.execute('''UPDATE locations SET height = ? WHERE camera = "true"''', (height, ))
         #endregion
         
         #region Kameranın aşağı hareketi
         elif msg[0] == "MVD":
-            self.qThread.put("MVD")
             cur.execute('''SELECT height FROM locations WHERE camera = "true" ''')
             locations = cur.fetchall()
             camera_location = locations[0]
             height = camera_location[0]
             height = height - 1
+            self.qThread.put("CAM:"+str(height))
             cur.execute('''UPDATE locations SET height = ? WHERE camera = "true"''', (height, ))
         #endregion
 
